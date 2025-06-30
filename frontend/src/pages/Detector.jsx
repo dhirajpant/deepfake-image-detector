@@ -90,10 +90,9 @@ export default function Detector() {
       return;
     }
     setSubmittedFeedback({ rating, feedback });
-    // future: send this feedback to backend
+    // Future: send this feedback to backend
   };
 
-  // Star component
   const Star = ({ filled, onClick, onMouseEnter, onMouseLeave }) => (
     <svg
       onClick={onClick}
@@ -171,50 +170,48 @@ export default function Detector() {
             }
           `}
         >
-          <h3 className="text-2xl font-bold mb-2">
-            Result: {result.label}
-          </h3>
+          <h3 className="text-2xl font-bold mb-2">Result: {result.label}</h3>
           <p className="text-lg">
             Confidence: {(result.confidence * 100).toFixed(2)}%
           </p>
 
           {/* Rating Section */}
-          <div className="mt-6">
-            <h4 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-400">
-              Rate your experience:
-            </h4>
-            <div className="flex justify-center space-x-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  filled={star <= (hoverRating || rating)}
-                  onClick={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                />
-              ))}
-            </div>
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Tell us about your experience..."
-              className="mt-4 w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
-              rows={4}
-            />
-            <button
-              onClick={submitFeedback}
-              className="mt-3 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-md font-semibold transition"
-            >
-              Submit Feedback
-            </button>
-
-            {submittedFeedback && (
-              <div className="mt-4 text-green-600 dark:text-green-400 font-semibold">
-                Thanks for your feedback! You rated {submittedFeedback.rating}{" "}
-                star{submittedFeedback.rating > 1 ? "s" : ""}.
+          {!submittedFeedback ? (
+            <div className="mt-6">
+              <h4 className="text-xl font-semibold mb-2 text-indigo-700 dark:text-indigo-400">
+                Rate your experience:
+              </h4>
+              <div className="flex justify-center space-x-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    filled={star <= (hoverRating || rating)}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                  />
+                ))}
               </div>
-            )}
-          </div>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Tell us about your experience..."
+                className="mt-4 w-full p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                rows={4}
+              />
+              <button
+                onClick={submitFeedback}
+                className="mt-3 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-md font-semibold transition"
+              >
+                Submit Feedback
+              </button>
+            </div>
+          ) : (
+            <div className="mt-6 text-green-600 dark:text-green-400 font-semibold text-lg">
+              Thanks for your feedback! You rated {submittedFeedback.rating}{" "}
+              star{submittedFeedback.rating > 1 ? "s" : ""}.
+            </div>
+          )}
         </div>
       )}
     </section>
