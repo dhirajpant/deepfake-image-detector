@@ -1,78 +1,41 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function UploadForm({ onResult, onFileChange }) {
+export default function UploadForm({ onPredict, loading }) {
   const [file, setFile] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleFileChange = (e) => {
-    setError("");
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(selectedFile);
-
-      // Pass file and previewUrl to parent
-      onFileChange(selectedFile, previewUrl);
+    const selected = e.target.files[0];
+    if (selected) {
+      setFile(selected);
+      setPreviewUrl(URL.createObjectURL(selected));
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
-
-    if (!file) {
-      setError("Please select an image file");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("http://localhost:8000/predict", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        onResult(data);
-      } else {
-        setError(data.error || "Prediction failed");
-      }
-    } catch (err) {
-      setError("Error connecting to server");
-    } finally {
-      setLoading(false);
+    if (file) {
+      onPredict(file);
     }
   };
-
-  // Cleanup preview URL when component unmounts or file changes
-  useEffect(() => {
-    return () => {
-      if (file) URL.revokeObjectURL(file);
-    };
-  }, [file]);
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md"
+      className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 max-w-lg mx-auto"
     >
       <label
         htmlFor="fileInput"
-        className="block mb-4 cursor-pointer border-2 border-dashed border-gray-300 rounded-lg p-10 text-center hover:border-blue-500 transition"
+        className="block mb-4 cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-indigo-500 transition"
       >
-        {file ? (
-          <p className="text-gray-700">{file.name}</p>
+        {previewUrl ? (
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="max-h-64 mx-auto rounded"
+          />
         ) : (
-          <p className="text-gray-400">Click or drag image here to upload</p>
+          <p className="text-gray-500 dark:text-gray-400">Click or drag an image here to upload</p>
         )}
         <input
           id="fileInput"
@@ -83,14 +46,10 @@ export default function UploadForm({ onResult, onFileChange }) {
         />
       </label>
 
-      {error && (
-        <p className="mb-4 text-red-600 font-semibold text-center">{error}</p>
-      )}
-
       <button
         type="submit"
-        disabled={loading}
-        className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        disabled={!file || loading}
+        className="w-full py-3 mt-4 bg-indigo-600 text-white rounded hover:bg-indigo-700 disabled:opacity-50 transition"
       >
         {loading ? "Predicting..." : "Predict"}
       </button>
